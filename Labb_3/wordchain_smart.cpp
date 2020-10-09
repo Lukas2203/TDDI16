@@ -1,86 +1,103 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <queue>
 #include <set>
+#include <algorithm>
+#include <queue>
 
+using namespace std;
 using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
-using namespace std;
 
 // Typ som används för ordlistan. Den definieras med en typedef här så att du enkelt kan ändra
 // representationen av en ordlista utefter vad din implementation behöver. Funktionen
 // "read_questions" skickar ordlistan till "find_shortest" och "find_longest" med hjälp av denna
 // typen.
-typedef vector<string> Dictionary;
-
-
- bool is_neighbor(Word a, Word b)
- {
-    int diff{};
-    for(int i{}; i < a.w.size(); i++)
-    {
-        if(a.w[i] != b.w[i])
-        {
-            diff++;
-        }
-    }
-    return diff == 1;
- }
-
-
-struct Word
-{
-    string w;
-    vector<Word> neighbors;
-    Word(string s, Dictionary dict) :
-        w{s}, neighbors{} {}
-};
-
-bool is_path(Word w1, Word w2)
-{
-    queue<Word> next_words;
-    set<Word> prev;
-
-    next_words.push(w1);
-    prev.insert(w1);
-
-    while(!next_words.empty())
-    {
-        Word next = next_words.front();
-        next_words.pop();
-
-        if(next == w2)
-        {
-            return true;
-        }
-
-        prev.insert(next);
-
-        for(Word neighbor : next.neighbors)
-        {
-            if(prev.count(neighbor) == 0)
-            {
-                next_words.push(neighbor);
-            }
-        }
-    }
-
-    return false;
-}
-
-//Skapa Word av alla ord
-//Lägga in allas neighbors. 
+typedef set<string> Dictionary;
 
 /**
  * Hitta den kortaste ordkedjan från 'first' till 'second' givet de ord som finns i
  * 'dict'. Returvärdet är den ordkedja som hittats, första elementet ska vara 'from' och sista
  * 'to'. Om ingen ordkedja hittas kan en tom vector returneras.
  */
-vector<string> find_shortest(const Dictionary &dict, const string &from, const string &to) {
+vector<string> find_shortest(const Dictionary &dict, const string &start, const string &target) {
     vector<string> result;
+    set<string> D{dict};
+
+
+    // If the target string is not 
+    // present in the dictionary 
+    if (D.find(target) == D.end()) 
+        return result; 
+
+    // To store the current chain length 
+    // and the length of the words 
+    int level = 0, wordlength = start.size();
+
+    // Push the starting word into the queue 
+    queue<string> Q; 
+    Q.push(start); 
+    vector<string> prev(dict.size());
+
+    // While the queue is non-empty 
+    while (!Q.empty()) { 
+  
+        // Increment the chain length 
+        ++level; 
+  
+        // Current size of the queue 
+        int sizeofQ = Q.size(); 
+  
+        // Since the queue is being updated while 
+        // it is being traversed so only the 
+        // elements which were already present 
+        // in the queue before the start of this 
+        // loop will be traversed for now 
+        for (int i = 0; i < sizeofQ; ++i) { 
+  
+            // Remove the first word from the queue 
+            string word = Q.front(); 
+            Q.pop(); 
+  
+            // For every character of the word 
+            for (int pos = 0; pos < wordlength; ++pos) { 
+  
+                // Retain the original character 
+                // at the current position 
+                char orig_char = word[pos]; 
+  
+                // Replace the current character with 
+                // every possible lowercase alphabet 
+                for (char c = 'a'; c <= 'z'; ++c) { 
+                    word[pos] = c; 
+  
+                    // If the new word is equal 
+                    // to the target word 
+                    if (word == target) 
+                    { 
+                        cout << "RETURN: " << level + 1 << endl;
+                        return result; 
+                    }
+                    // Remove the word from the set 
+                    // if it is found in it 
+                    // And push the newly generated word 
+                    // which will be a part of the chain 
+                    if (D.find(word) != D.end()) 
+                    {
+                        D.erase(word);
+                        Q.push(word);
+                        
+                    } 
+                } 
+  
+                // Restore the original character 
+                // at the current position 
+                word[pos] = orig_char; 
+            } 
+        } 
+    } 
 
     return result;
 }

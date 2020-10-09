@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <chrono>
 #include <utility>
+#include <map>
+#include <list>
+#include <set>
 
 using std::vector;
 using std::string;
@@ -16,7 +19,7 @@ using namespace std;
 // representationen av en ordlista utefter vad din implementation behöver. Funktionen
 // "read_questions" skickar ordlistan till "find_shortest" och "find_longest" med hjälp av denna
 // typen.
-typedef vector<string> Dictionary;
+typedef set<string> Dictionary;
 
 
 bool is_neighbor(const string &a, const string &b)
@@ -38,33 +41,8 @@ bool is_neighbor(const string &a, const string &b)
  * 'to'. Om ingen ordkedja hittas kan en tom vector returneras.
  */
 
-int get_index(Dictionary dict, string a)
-{
-    int dis{};
-    auto it = find(dict.begin(),dict.end(), a);
-    
-    dis = distance(dict.begin(), it);
-    return dis;
-}
 
-vector<vector<string>> build_graph(const Dictionary &dict)
-{
-    vector<vector<string>> graph(dict.size());
-    size_t dict_size{dict.size()};
-    for (int i{}; i < dict_size; i++)
-    {
-        for(string word : dict)
-        {
-            if(is_neighbor(dict[i], word))
-            {
-                graph[i].push_back(word);
-            }
-        }
-    }
-    return graph;
-}
-
-vector<string> find_shortest(const Dictionary &dict, const string &from, const string &to, const vector<vector<string>> &graph) {
+vector<string> find_shortest(const Dictionary &dict, const string &from, const string &to) {
     
     vector<string> result;
     size_t dict_size{dict.size()};
@@ -72,50 +50,45 @@ vector<string> find_shortest(const Dictionary &dict, const string &from, const s
     queue<string> q;
     q.push(from);
     
-    vector<string> prev(dict_size);
-    vector<string> visited(dict_size);
+    map<string,string> parents;
 
-    visited.push_back(from);
+    map<string,bool> visited;
+    
+    visited[from] = true;
 
     while(!q.empty())
     {
         string node = q.front();
         q.pop();
-
-        vector<string> neighbors = graph[get_index(dict,node)];
-
-        for(string next : neighbors)
+    
+        for(string next : dict)
         {
-            if(find(visited.begin(), visited.end(), next) == visited.end())
+            if(is_neighbor(node,next))
             {
-                q.push(next);
-                visited.push_back(next);
-                prev[get_index(dict,next)] = node;
+                if(visited[next] == false)
+                {
+                    q.push(next);
+                    visited[next] = true;
+                    parents[next] = node;
+                }
             }
-            
         }
         
         
     }
-    //prev
-    vector<string> path{};
 
-    
-    for(string curr{to}; curr != ""; curr = prev[get_index(dict,curr)])
+    for(string curr{to}; curr != ""; curr = parents[curr])
     {
-        path.push_back(curr);
+        result.push_back(curr);
     }
 
-    //reverse(path.begin(), path.end());
-    //auto it = find(path.begin(), path.end(), "");
-    //path.resize(distance(path.begin(), find(path.begin(),path.end(), "")));
+    reverse(result.begin(), result.end());
 
-    if(path.size() <= 1)
+    if(result.size() <= 1)
     {
-        path.clear();
+        result.clear();
     }
-    
-    result = path;
+
     return result;
 }
 
@@ -127,89 +100,76 @@ vector<string> find_shortest(const Dictionary &dict, const string &from, const s
  * Hitta den längsta kortaste ordkedjan som slutar i 'word' i ordlistan 'dict'. Returvärdet är den
  * ordkedja som hittats. Det sista elementet ska vara 'word'.
  */
-vector<string> find_longest(const Dictionary &dict, const string &word, const vector<vector<string>> &graph) {
+vector<string> find_longest(const Dictionary &dict, const string &word) {
+    auto start = chrono::high_resolution_clock::now();
     vector<string> result;
-
     size_t dict_size{dict.size()};
 
     queue<string> q;
     q.push(word);
     
+    map<string,string> parents;
     
-
-    //vector<string> prev(dict_size);
     vector<string> prev(dict_size);
-    vector<string> visited(dict_size);
-    visited.push_back(word);
+    map<string,bool> visited;
+    for(string s : dict)
+    {
+        visited[s] = false;
+    }
+
+    visited[word] = true;
     while(!q.empty())
     {
         string node = q.front();
         q.pop();
-
-        vector<string> neighbors = graph[get_index(dict,node)];
-
-        for(string next : neighbors)
+    
+        for(pair<string,bool> p : visited)  //nåt sätt för att inte gå igenom alla? Bara gå igenom de som inte är visited?
         {
-            bool vis{};
-            vis = find(visited.begin(), visited.end(), next) != visited.end();            
-            if(!vis)
+            if(!p.second && is_neighbor(node,p.first))
             {
-                q.push(next);
-                visited.push_back(next);
-                prev[get_index(dict,next)] = node;
+                string next{p.first};
+                //if(visited[next] == false)
+                //{
+                    q.push(next);
+                    visited[next] = true;
+                    parents[next] = node;
+                    
+                //}
             }
-            
         }
         
-        
-    }
-    //prev
-    vector<string> path;
-
-
-    /*for(string curr{to}; curr != ""; curr = prev[get_index(dict,curr)])
-    {
-        path.push_back(curr);
-    }*/
-
-    for(string from : dict)
-    {
-        vector<string> test_path;
-        for(string curr{from}; curr != ""; curr = prev[get_index(dict,curr)])
-        {
-            test_path.push_back(curr);
-        }
-        if(test_path.size() > path.size())
-        {
-            path = test_path;
-        }
-    }
-
-    //reverse(path.begin(), path.end());
-    //auto it = find(path.begin(), path.end(), "");
-    //path.resize(distance(path.begin(), find(path.begin(),path.end(), "")));
-    //reverse(path.begin(), path.end());
-    if(path.size() <= 1)
-    {
-        path.clear();
     }
     
-    result = path;
-    return result;
+    for(string s : dict)
+    {
+        int size_check{};
+        Dictionary test_path;
+        for(string curr{s}; curr != ""; curr = parents[curr])
+        {
+            size_check++;
+            //test_path.push_back(curr);
+        }
+        if(size_check > result.size())
+        {
+            for(string curr{s}; curr != ""; curr = parents[curr])
+            {
+            result.push_back(curr);
+            }
+        }
+    }
 
+
+    if(result.size() <= 1)
+    {
+        result.clear();
+    }
+
+    auto end = chrono::high_resolution_clock::now();
+    auto time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+    cout << "elapsed time: " << time << endl;
+    
     return result;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 /**
@@ -250,13 +210,12 @@ void print_chain(const vector<string> &chain) {
  */
 void read_questions(const Dictionary &dict) {
     string line;
-    vector<vector<string>> graph = build_graph(dict);
     while (std::getline(std::cin, line)) {
         size_t space = line.find(' ');
         if (space != string::npos) {
             string first = line.substr(0, space);
             string second = line.substr(space + 1);
-            vector<string> chain = find_shortest(dict, first, second, graph);
+            vector<string> chain = find_shortest(dict, first, second);
 
             cout << first << " " << second << ": ";
             if (chain.empty()) {
@@ -266,7 +225,7 @@ void read_questions(const Dictionary &dict) {
                 print_chain(chain);
             }
         } else {
-            vector<string> chain = find_longest(dict, line, graph);
+            vector<string> chain = find_longest(dict, line);
 
             cout << line << ": " << chain.size() << " ord" << endl;
             print_chain(chain);
