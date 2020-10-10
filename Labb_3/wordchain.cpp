@@ -8,6 +8,8 @@
 #include <map>
 #include <list>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 using std::vector;
 using std::string;
@@ -19,13 +21,13 @@ using namespace std;
 // representationen av en ordlista utefter vad din implementation behöver. Funktionen
 // "read_questions" skickar ordlistan till "find_shortest" och "find_longest" med hjälp av denna
 // typen.
-typedef set<string> Dictionary;
+typedef list<string> Dictionary;
 
 
 bool is_neighbor(const string &a, const string &b)
 {
     int diff{};
-    for(int i{}; i < a.size(); i++)
+    for(size_t i{}; i < a.size(); i++)
     {
         if(a[i] != b[i])
         {
@@ -33,6 +35,39 @@ bool is_neighbor(const string &a, const string &b)
         }
     }
     return diff == 1;
+}
+
+
+unordered_map<string, vector<string>> create_graph(const unordered_set<string>& new_dict)
+{
+    unordered_map<string, vector<string>> graph;
+    for(string node : new_dict)
+    {
+        string orig_word{node};
+        for(int i{}; i < 4; i++)
+        {
+            for (char c = 'a'; c <= 'z'; c++)
+            {
+                node.at(i) = c;
+                cout << "new node: " << node << endl;
+                if(is_neighbor(node, orig_word) && new_dict.find(node)!=new_dict.end())
+                    graph[orig_word].push_back(node);
+                else if(new_dict.find(node)!=new_dict.end())
+                    graph[orig_word];
+            }
+            node = orig_word;
+        }
+    }
+    /*for(pair<string, vector<string>> s : graph)
+    {
+        cout << s.first << " -> ";
+        for(string b : s.second)
+        {
+            cout << b << " ";
+        }
+    cout << endl;
+    }*/
+    return graph;
 }
 
 /**
@@ -45,16 +80,12 @@ bool is_neighbor(const string &a, const string &b)
 vector<string> find_shortest(const Dictionary &dict, const string &from, const string &to) {
     
     vector<string> result;
-    size_t dict_size{dict.size()};
 
     queue<string> q;
     q.push(from);
     
-    map<string,string> parents;
-
-    map<string,bool> visited;
-    
-    visited[from] = true;
+    unordered_map<string,string> parents;
+    parents[from] = "";
 
     while(!q.empty())
     {
@@ -64,17 +95,14 @@ vector<string> find_shortest(const Dictionary &dict, const string &from, const s
         for(string next : dict)
         {
             if(is_neighbor(node,next))
-            {
-                if(visited[next] == false)
+            {                
+                if(  parents.find(next) == parents.end())
                 {
                     q.push(next);
-                    visited[next] = true;
                     parents[next] = node;
                 }
             }
         }
-        
-        
     }
 
     for(string curr{to}; curr != ""; curr = parents[curr])
@@ -100,61 +128,73 @@ vector<string> find_shortest(const Dictionary &dict, const string &from, const s
  * Hitta den längsta kortaste ordkedjan som slutar i 'word' i ordlistan 'dict'. Returvärdet är den
  * ordkedja som hittats. Det sista elementet ska vara 'word'.
  */
-vector<string> find_longest(const Dictionary &dict, const string &word) {
+vector<string> find_longest(const Dictionary &dict, const string &word, /* const unordered_map<string, vector<string>>& adj_list, */ const unordered_set<string>& new_dict) {
     auto start = chrono::high_resolution_clock::now();
+    cout << "find_longest started" << endl;
     vector<string> result;
-    size_t dict_size{dict.size()};
+
+    vector<string> new_visited;
 
     queue<string> q;
     q.push(word);
     
-    map<string,string> parents;
-    
-    vector<string> prev(dict_size);
-    map<string,bool> visited;
-    for(string s : dict)
-    {
-        visited[s] = false;
-    }
+    unordered_map<string,string> parents;
+    parents[word] = "";
 
-    visited[word] = true;
     while(!q.empty())
-    {
+    {        
         string node = q.front();
         q.pop();
-    
-        for(pair<string,bool> p : visited)  //nåt sätt för att inte gå igenom alla? Bara gå igenom de som inte är visited?
+        
+        string orig_word{node};
+        //for(string next : /* new_dict */ adj_list.at(node))
+        for(int i{}; i < 4; i++)
         {
-            if(!p.second && is_neighbor(node,p.first))
+            for (char c = 'a'; c <= 'z'; c++)
             {
-                string next{p.first};
-                //if(visited[next] == false)
-                //{
-                    q.push(next);
-                    visited[next] = true;
-                    parents[next] = node;
-                    
-                //}
+                node.at(i) = c;
+                if(is_neighbor(orig_word, node) && new_dict.find(node)!=new_dict.end())
+                {
+                   if(parents.find(node) == parents.end())
+                   {
+                        q.push(node);
+                        parents[node] = orig_word;
+                        new_visited.push_back(node);
+                        //new_dict.erase(next);
+                   } 
+                }
             }
+            node = orig_word;
+            // if(is_neighbor(node,next))
+            // {
+            //     if(parents.find(next) == parents.end())
+            //     {
+            //         q.push(next);
+            //         parents[next] = node;
+            //         new_visited.push_back(next);
+            //         //new_dict.erase(next);
+            //     }
+            // }
         }
         
+        for(string s : new_visited)
+        {
+            //new_dict.erase(s);
+        }
+        new_visited.clear();
+        
     }
-    
+
     for(string s : dict)
     {
-        int size_check{};
-        Dictionary test_path;
+        vector<string> test_path;
         for(string curr{s}; curr != ""; curr = parents[curr])
         {
-            size_check++;
-            //test_path.push_back(curr);
+            test_path.push_back(curr);
         }
-        if(size_check > result.size())
+        if(test_path.size() > result.size())
         {
-            for(string curr{s}; curr != ""; curr = parents[curr])
-            {
-            result.push_back(curr);
-            }
+            result = test_path;
         }
     }
 
@@ -165,9 +205,8 @@ vector<string> find_longest(const Dictionary &dict, const string &word) {
     }
 
     auto end = chrono::high_resolution_clock::now();
-    auto time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-    cout << "elapsed time: " << time << endl;
-    
+    auto time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    cout << "TIME: " << time << endl;
     return result;
 }
 
@@ -208,9 +247,12 @@ void print_chain(const vector<string> &chain) {
 /**
  * Läs in alla frågor. Anropar funktionerna "find_shortest" eller "find_longest" ovan när en fråga hittas.
  */
-void read_questions(const Dictionary &dict) {
+void read_questions(const Dictionary &dict, /* const unordered_map<string,vector<string>>& adj_list, */ const unordered_set<string>& new_dict) {
     string line;
+    int quest_num {};
     while (std::getline(std::cin, line)) {
+        quest_num++;
+        cout << quest_num << endl;
         size_t space = line.find(' ');
         if (space != string::npos) {
             string first = line.substr(0, space);
@@ -225,7 +267,7 @@ void read_questions(const Dictionary &dict) {
                 print_chain(chain);
             }
         } else {
-            vector<string> chain = find_longest(dict, line);
+            vector<string> chain = find_longest(dict, line, /* adj_list, */ new_dict);
 
             cout << line << ": " << chain.size() << " ord" << endl;
             print_chain(chain);
@@ -235,7 +277,14 @@ void read_questions(const Dictionary &dict) {
 
 int main() {
     Dictionary dict = read_dictionary();
-    read_questions(dict);
+    unordered_set<string> new_dict;
+    for(string w : dict)
+    {
+        new_dict.insert(w);
+    }
+    //unordered_map<string, vector<string>> adj_list {create_graph(new_dict)};
+    cout << "graph created" << endl;
+    read_questions(dict, /* adj_list, */ new_dict);
 
 
 
