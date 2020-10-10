@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp",
+        "iostream": "cpp",
+        "map": "cpp",
+        "list": "cpp",
+        "chrono": "cpp",
+        "utility": "cpp",
+        "xutility": "cpp",
+        "queue": "cpp",
+        "unordered_map": "cpp",
+        "xhash": "cpp",
+        "ostream": "cpp",
+        "unordered_set": "cpp"
+    }
+}
