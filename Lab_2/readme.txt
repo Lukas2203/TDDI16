@@ -49,8 +49,11 @@ Char     Brute
  4      < 1 s
  5        7 s
  6        294 s
- 8        *12348 s (294/7*294)
-
+ 8       *610 792 s
+    (uppskattningen skedde genom att lägga in uppmätta värden i en 
+    grafritare och hitta en funktion (med hjälp av tidskomplexitet) 
+    som på ett ungefär stämmer överens med punkterna och sedan läsa av 
+    de uppskattade värden)
 
 /******************************************************************************
  *  Hur lång tid använder decrypt.c för att knäcka lösenord av en viss storlek?
@@ -61,18 +64,22 @@ Char     Brute
 
 Char    Tid (sekunder)            Minne (bytes) (enligt valgrind)
 -----------------------------------------------------------------
-6       < 1 s                     32k
-8       14 s                      43 672k
-10      590 s                     *
-12      *24864 s (590/14*590)     *
-
+6       < 1 s                     1 290k
+8       14 s                      40 677k
+10      590 s                     * 
+12      *17 507 s                 * 
+    (uppskattningen skedde genom att lägga in uppmätta värden i en 
+    grafritare och hitta en funktion (med hjälp av tidskomplexitet) 
+    som på ett ungefär stämmer överens med punkterna och sedan läsa av 
+    de uppskattade värden)
+    ()
 /*************************************************************************
  * Hur många operationer använder brute.c för ett N-bitars lösenord?
  * Hur många operationer använder din decrypt.c för ett N-bitars lösenord?
  * Använd ordo-notation.
  *************************************************************************/
 brute: O(2^n)
-decrypt: O(2^(n/2)) (=O(2^n)?)
+decrypt: O(2^(n/2))
 
 
 /*************************************************************************

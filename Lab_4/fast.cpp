@@ -10,20 +10,23 @@
 #include <chrono>
 #include "point.h"
 #include "window.h"
+#include <map>
 
 using namespace std;
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[])
+{
     WindowPtr window = create_window(argc, argv);
 
     // The array of points
     vector<Point> points;
 
     // Read points from cin
-    int N{};
+    int N{}; //N = Number of points
     cin >> N;
 
-    for (int i{0}; i < N; ++i) {
+    for (int i{0}; i < N; ++i)
+    {
         unsigned int x, y;
         cin >> x >> y;
         points.push_back(Point{x, y});
@@ -41,6 +44,25 @@ int main(int argc, const char* argv[]) {
     /////////////////////////////////////////////////////////////////////////////
     // Draw any lines that you find in 'points' using the function 'window->draw'.
     /////////////////////////////////////////////////////////////////////////////
+
+    for (int i = 0; i < N-3; ++i) // i = 
+    {
+        map<double, vector<Point>> matches; //store matches for point i
+        for (int j = i + 1; j < N; ++j) // j = 
+        {
+            matches[points.at(i).slopeTo(points.at(j))].push_back(points.at(j)); //add the slope from i to j and push pont j to the vector
+        }
+        for (auto it = matches.begin(); it != matches.end(); ++it) //for every object in matches
+        {
+            if (it->second.size() >= 3) //if there are lines with three or more points 
+            {
+                it->second.push_back(points.at(i)); //add point i
+                sort(it->second.begin(), it->second.end()); //sort points in the vector to draw from "smallest" to "biggest"
+                //render_line(screen, it->second.front(), it->second.back());
+                window->draw(it->second.front(), it->second.back()); //draw line
+            }
+        }
+    }
 
     auto end = chrono::high_resolution_clock::now();
     cout << "Computing line segments took "

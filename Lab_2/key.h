@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#define C 5         // number of characters in password
+#define C 10         // number of characters in password
 #define B 5         // number of bits per character
 #define R (1 << B)  // size of alphabet (32)
 #define N (B * C)   // number of bits per password

@@ -1,35 +1,35 @@
 /**********************************************************************
- *  Mönsterigenkänning readme.txt
+ *  MÃ¶nsterigenkÃ¤nning readme.txt
  **********************************************************************/
 
- Ungefärligt antal timmar spenderade på labben (valfritt):
+ UngefÃ¤rligt antal timmar spenderade pÃ¥ labben (valfritt): -
 
 /**********************************************************************
- *  Empirisk    Fyll i tabellen nedan med riktiga körtider i sekunder
- *  analys      när det känns vettigt att vänta på hela beräkningen.
- *              Ge uppskattningar av körtiden i övriga fall.
+ *  Empirisk    Fyll i tabellen nedan med riktiga kÃ¶rtider i sekunder
+ *  analys      nÃ¤r det kÃ¤nns vettigt att vÃ¤nta pÃ¥ hela berÃ¤kningen.
+ *              Ge uppskattningar av kÃ¶rtiden i Ã¶vriga fall.
  *
  **********************************************************************/
     
       N       brute       sortering
  ----------------------------------
-    150
-    200
-    300
-    400
-    800
-   1600
-   3200
-   6400
-  12800
+    150        0,008
+    200        0,015
+    300        0,043
+    400        0,108
+    800        0,461
+   1600        3,538
+   3200       28,067
+   6400      223,607
+  12800     1830,090
 
 
 /**********************************************************************
- *  Teoretisk   Ge ordo-uttryck för värstafallstiden för programmen som
+ *  Teoretisk   Ge ordo-uttryck fÃ¶r vÃ¤rstafallstiden fÃ¶r programmen som
  *  analys      en funktion av N. Ge en kort motivering.
  *
  **********************************************************************/
 
-Brute:
+Brute: O(n^4)
 
-Sortering:
+Sortering: 
