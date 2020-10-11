@@ -20,7 +20,10 @@ hashtabellen 0 har vi hittat en möjlig lösning till det hashade lösenordet.
  *  Beskriv symboltabellen du använt för decrypt.c.
  **********************************************************************/
 Vår symboltabell använder typen Key som nyckel och en vector av Key som värde.
-Samt en hashfunktion som räknar fram ett heltal utifrån binära värdet på Key.
+Alla möjliga kombinationer av första halvan av binära representationen av 
+ett lösenord (least_significant) sparas i symboltabellen tillsammans med värdet
+hashed-subset_sum(least_significant).
+Samt en enkel hashfunktion som räknar fram ett heltal utifrån binära värdet på Key.
 
 
 /**********************************************************************
@@ -34,7 +37,7 @@ Samt en hashfunktion som räknar fram ett heltal utifrån binära värdet på Ke
 congrats, ibqfehan        completely, nbryjimvrd
 mqubzd45, youfound        unbreakabl
 theright                  cryptogram
-aeiqrsd4, solution        ormaybenot,
+aeiqrsd4, solution        ormaybenot
 
 
 /****************************************************************************
@@ -66,13 +69,12 @@ Char    Tid (sekunder)            Minne (bytes) (enligt valgrind)
 -----------------------------------------------------------------
 6       < 1 s                     1 290k
 8       14 s                      40 677k
-10      590 s                     * 
-12      *17 507 s                 * 
+10      590 s                     *340 000k
+12      *17 507 s                 *2 064 000k 
     (uppskattningen skedde genom att lägga in uppmätta värden i en 
     grafritare och hitta en funktion (med hjälp av tidskomplexitet) 
     som på ett ungefär stämmer överens med punkterna och sedan läsa av 
     de uppskattade värden)
-    ()
 /*************************************************************************
  * Hur många operationer använder brute.c för ett N-bitars lösenord?
  * Hur många operationer använder din decrypt.c för ett N-bitars lösenord?
@@ -88,4 +90,4 @@ decrypt: O(2^(n/2))
  *************************************************************************/
 - Så få collisioner som möjligt, dvs fördela värden så jämt det går
 - Använda hela indata för att ta fram hashvärde (inte bara en del)
-- Genererar väldigt olika hashvärden för indata med lite skillnad.
+- Genererar väldigt olika hashvärden för liknande men inte samma indata.

@@ -78,11 +78,6 @@ int main(int argc, char* argv[]) {
       least_significant++;
     }
 
-// ########################### Hashtabell ###########################
-// Hashvärde            krypterad least_significant            least_significant
-//  size_t        Key=subset_sum(least_significant, table)    vector<Key>=least_sinificant
-//
-
 
     //Kollar om något i hash-tabellen från tidigare loop stämmer överens med
     //någon most_significant, om så skrivs den ut i terminalen
