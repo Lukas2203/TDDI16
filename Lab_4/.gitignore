@@ -1,0 +1,10 @@
+brute
+fast
+*.o
+*~
+*.exe
+*.user
+*.iobj
+*.ipdb
+*.pdb
+.vs/

@@ -10,7 +10,7 @@
 #include <chrono>
 #include "point.h"
 #include "window.h"
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -45,22 +45,25 @@ int main(int argc, const char *argv[])
     // Draw any lines that you find in 'points' using the function 'window->draw'.
     /////////////////////////////////////////////////////////////////////////////
 
-    for (int i = 0; i < N-3; ++i) // i = 
+
+    for(Point p : points) //Gå igenom alla punkter
     {
-        map<double, vector<Point>> matches; //store matches for point i
-        for (int j = i + 1; j < N; ++j) // j = 
-        {
-            matches[points.at(i).slopeTo(points.at(j))].push_back(points.at(j)); //add the slope from i to j and push pont j to the vector
+        unordered_map<double, vector<Point>> matches; //map för att spara alla punkter med samma lutning mot p
+        Point curr_point{p};
+        
+        for(Point q : points) //Gå igenom alla punkter igen
+        {   
+            matches[curr_point.slopeTo(q)].push_back(q); //Räkna ut lutning från p till q
         }
-        for (auto it = matches.begin(); it != matches.end(); ++it) //for every object in matches
+        
+        for(pair<double, vector<Point>> match : matches) //gå igenom alla lutningar till alla punkter
         {
-            if (it->second.size() >= 3) //if there are lines with three or more points 
+            if(match.second.size() >= 3) //Kolla om vi har hittat minst tre andra punkter med samma lutning
             {
-                it->second.push_back(points.at(i)); //add point i
-                sort(it->second.begin(), it->second.end()); //sort points in the vector to draw from "smallest" to "biggest"
-                //render_line(screen, it->second.front(), it->second.back());
-                window->draw(it->second.front(), it->second.back()); //draw line
+                match.second.push_back(p); //Lägg till ursprungspunkten (p)
+                window->draw(match.second.front(),match.second.back()); //skriv ut linje
             }
+            
         }
     }
 
